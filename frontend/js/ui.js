@@ -150,7 +150,12 @@ function escapeHTML(str) {
   }[tag] || tag));
 }
 
-// Initialize theme, PWA service worker & global keyboard shortcuts
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   UI.initTheme();
   UI.initShortcuts();
@@ -160,21 +165,25 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(() => console.log('✅ PWA Service Worker Registered'))
       .catch((err) => console.warn('PWA SW Registration failed:', err));
   }
-});
 
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
   const pwaBtn = document.getElementById('pwaInstallBtn');
   if (pwaBtn) {
-    pwaBtn.style.display = 'inline-flex';
-    pwaBtn.onclick = () => {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
+    pwaBtn.onclick = async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const choiceResult = await deferredPrompt.userChoice;
+        if (choiceResult.outcome === 'accepted') {
+          UI.showToast('whatsapp12 App installed successfully!', 'success');
+        }
         deferredPrompt = null;
-        pwaBtn.style.display = 'none';
-      });
+      } else {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+          alert('To install whatsapp12 on iPhone:\n\n1. Tap the Share button (↑) at bottom\n2. Select "Add to Home Screen"');
+        } else {
+          alert('To install whatsapp12 on Android:\n\n1. Tap the 3 dots menu (⋮) at top right\n2. Select "Add to Home screen" or "Install app"');
+        }
+      }
     };
   }
 });
