@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatFlow</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/chat.css">
+  <link rel="stylesheet" href="/css/modals.css">
+</head>
+<body>
+  <div class="chat-app" id="chatAppRoot">
+    
+    <!-- ─── LEFT SIDEBAR ─────────────────────────────────────────────────────── -->
+    <div class="sidebar" id="sidebar">
+      
+      <!-- Top header -->
+      <div class="sidebar-header">
+        <div class="user-profile-btn" onclick="window.location.href='/profile.html'" title="My Profile">
+          <div class="avatar-mini" id="myAvatarMini"></div>
+        </div>
+        <div class="sidebar-actions">
+          <button class="icon-btn" id="themeToggleBtn" onclick="UI.toggleTheme()" title="Toggle Theme (Dark / Light)">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="openNewChatModal()" title="New Chat">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="openNewGroupModal()" title="New Group">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="window.location.href='/settings.html'" title="Settings">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="auth.logout()" title="Logout">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search bar -->
+      <div class="sidebar-search-box">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" id="globalSearch" placeholder="Search or start new chat">
+        </div>
+      </div>
+
+      <section class="status-strip" aria-label="Status updates">
+        <button class="my-status-card" id="myStatusBtn" type="button">
+          <span class="status-avatar-wrap">
+            <span class="status-avatar" id="myStatusAvatar"></span>
+            <span class="status-add">+</span>
+          </span>
+          <span><strong>My status</strong><small>Tap to add status</small></span>
+        </button>
+        <div class="status-list" id="statusList"></div>
+      </section>
+
+      <!-- Chat list -->
+      <div class="chat-list" id="chatList">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+
+    <!-- ─── MAIN CHAT AREA ───────────────────────────────────────────────────── -->
+    <div class="chat-main" id="chatMain">
+
+      <!-- Empty State -->
+      <div class="chat-empty-state" id="emptyState">
+        <div class="empty-state-icon">
+          <svg width="84" height="84" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 13.85 2.5 15.55 3.39 17L2 22L7.23 20.65C8.63 21.5 10.26 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C10.5 20 9.09 19.58 7.87 18.84L7.54 18.64L4.41 19.46L5.25 16.41L5.04 16.07C4.24 14.81 3.81 13.43 3.81 12C3.81 7.48 7.48 3.81 12 3.81C16.52 3.81 20.19 7.48 20.19 12C20.19 16.52 16.52 20 12 20Z"/>
+          </svg>
+        </div>
+        <h2>Welcome to ChatFlow</h2>
+        <p>Send and receive messages with real-time speed, media sharing, and crystal clear calls.</p>
+      </div>
+
+      <!-- Active Chat View -->
+      <div class="chat-area" id="chatArea" style="display:none; position:relative;">
+
+        <!-- Drag & Drop Dropzone Overlay -->
+        <div id="chatDropzoneOverlay" class="chat-dropzone-overlay" style="display:none;">
+          <div class="dropzone-content">
+            <span class="dropzone-icon">📁</span>
+            <span>Drop photos, videos, or documents to send</span>
+          </div>
+        </div>
+
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <button class="icon-btn mobile-back-btn" id="mobileBackBtn" type="button" title="Back to chats">‹</button>
+            <div class="chat-header-avatar" id="chatHeaderAvatar"></div>
+            <div class="chat-header-details">
+              <h3 id="chatHeaderName">Conversation</h3>
+              <p id="chatHeaderStatus">offline</p>
+            </div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="icon-btn" id="voiceCallBtn" title="Voice Call">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1.01A11.36 11.36 0 0 1 8.57 3.9c0-.55-.45-1-1-1H4.03c-.55 0-1 .45-1 1C3.03 13.62 10.38 21 19.01 21c.55 0 1-.45 1-1v-3.62c0-.55-.45-1-1-1z"/></svg>
+            </button>
+            <button class="icon-btn" id="videoCallBtn" title="Video Call">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            </button>
+            <button class="icon-btn" id="exportChatBtn" onclick="chatApp.exportChat()" title="Export Chat Transcript">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="messages-container" id="messagesContainer">
+          <!-- Dynamic message bubbles rendered here -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typingIndicator" class="typing-box" style="display:none; margin: 0 24px 8px 24px;">
+          <span>Someone is typing</span>
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <!-- Chat Input Container -->
+        <div class="chat-input-container">
+          <!-- Reply Preview Bar -->
+          <div class="reply-preview-bar" id="replyPreviewBar" style="display:none;">
+            <div>
+              <div style="font-weight:600; color:var(--secondary); font-size:12px;">Replying to:</div>
+              <div id="replyPreviewText" style="color:var(--text-muted); text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:500px;"></div>
+            </div>
+            <button class="icon-btn" id="closeReplyBtn" style="width:28px; height:28px;">✕</button>
+          </div>
+
+          <!-- Voice Recording Bar -->
+          <div id="voiceRecordingBar" style="display:none; align-items:center; justify-content:space-between; padding:8px 0; gap:12px;">
+            <div style="display:flex; align-items:center; gap:8px; color:var(--danger); font-weight:600;">
+              <span>🔴</span> <span id="recordingTimer">0:00</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button id="cancelVoiceBtn" style="padding:6px 14px; background:var(--hover-bg); border:none; border-radius:var(--radius-sm); cursor:pointer;">Cancel</button>
+              <button id="stopVoiceBtn" style="padding:6px 14px; background:var(--secondary); color:#fff; border:none; border-radius:var(--radius-sm); cursor:pointer;">Send Note</button>
+            </div>
+          </div>
+
+          <!-- Input Row -->
+          <div class="chat-input-row" id="mainInputRow" style="position:relative;">
+            <!-- Attachment Menu Popup -->
+            <div id="attachMenu" class="attach-menu" style="display:none;">
+              <button class="attach-menu-item" id="attachPhotoVideoBtn" type="button">
+                <span class="attach-icon" style="background:#007bfc; color:#fff;">🖼️</span>
+                <span>Photos & Videos</span>
+              </button>
+              <button class="attach-menu-item" id="attachCameraBtn" type="button">
+                <span class="attach-icon" style="background:#e91e63; color:#fff;">📷</span>
+                <span>Camera</span>
+              </button>
+              <button class="attach-menu-item" id="attachDocBtn" type="button">
+                <span class="attach-icon" style="background:#5f66cd; color:#fff;">📄</span>
+                <span>Document</span>
+              </button>
+              <button class="attach-menu-item" id="shareLocationBtn" type="button">
+                <span class="attach-icon" style="background:#0a8f5b; color:#fff;">📍</span>
+                <span>Location</span>
+              </button>
+            </div>
+
+            <button class="icon-btn" id="emojiBtn" title="Emojis">😊</button>
+            <button class="icon-btn" id="attachBtn" title="Attach Document/Media">📎</button>
+            <input type="file" id="mediaFileInput" accept="image/*,video/*" style="display:none;">
+            <input type="file" id="docFileInput" style="display:none;">
+            <input type="file" id="fileInput" style="display:none;">
+            <input type="text" class="chat-text-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
+            <button class="icon-btn" id="voiceBtn" title="Voice Message">🎤</button>
+            <button class="send-btn-primary" id="sendBtn" title="Send">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="statusComposerModal" class="status-modal" style="display:none;">
+    <div class="status-composer">
+      <div class="status-modal-header">
+        <h3>Create Status Update</h3>
+        <button class="icon-btn" id="closeStatusComposerBtn" type="button" title="Close">✕</button>
+      </div>
+
+      <!-- Media Preview Area -->
+      <div id="statusMediaPreviewBox" style="display:none; margin-bottom:12px; position:relative; background:#000; border-radius:var(--radius-sm); overflow:hidden; max-height:220px; display:flex; align-items:center; justify-content:center;">
+        <img id="statusImagePreview" style="display:none; max-width:100%; max-height:220px; object-fit:contain;" alt="Preview" />
+        <video id="statusVideoPreview" controls style="display:none; max-width:100%; max-height:220px;"></video>
+        <audio id="statusAudioPreview" controls style="display:none; width:90%; margin:15px;"></audio>
+        <button type="button" id="removeStatusMediaBtn" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;">✕</button>
+      </div>
+
+      <textarea id="statusTextInput" maxlength="700" placeholder="Type a status update or caption..."></textarea>
+      
+      <div class="status-composer-footer" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="icon-btn" id="statusMediaBtn" type="button" title="Attach Media (Image, Video, Audio)" style="background:var(--hover-bg);">📎</button>
+          <input type="file" id="statusFileInput" accept="image/*,video/*,audio/*" style="display:none;">
+          <div class="status-colors" id="statusColors" aria-label="Status background color"></div>
+        </div>
+        <button class="auth-btn-primary status-post-btn" id="postStatusBtn" type="button">Post status</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusViewerModal" class="status-modal" style="display:none;">
+    <div class="status-viewer" id="statusViewer"></div>
+  </div>
+
+  <!-- ─── NEW CHAT MODAL ──────────────────────────────────────────────────────── -->
+  <div id="newChatModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:900; align-items:center; justify-content:center;">
+    <div style="background:var(--bg-card); border-radius:var(--radius-md); max-width:440px; width:90%; padding:20px; box-shadow:var(--shadow-md);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="font-size:18px;">Start New Chat</h3>
+        <button class="icon-btn" onclick="closeNewChatModal()">✕</button>
+      </div>
+      <div class="search-input-wrapper" style="margin-bottom:15px;">
+        <span>🔍</span>
+        <input type="text" id="userSearchInput" placeholder="Search by name, email, or phone...">
+      </div>
+      <div id="userSearchResults" style="max-height:280px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+        <div style="text-align:center; padding:15px; color:var(--text-muted); font-size:13px;">Type a query to find people</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── NEW GROUP MODAL ─────────────────────────────────────────────────────── -->
+  <div id="newGroupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:900; align-items:center; justify-content:center;">
+    <div style="background:var(--bg-card); border-radius:var(--radius-md); max-width:440px; width:90%; padding:20px; box-shadow:var(--shadow-md);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="font-size:18px;">Create New Group</h3>
+        <button class="icon-btn" onclick="closeNewGroupModal()">✕</button>
+      </div>
+      <form id="newGroupForm">
+        <div style="margin-bottom:12px;">
+          <label class="form-label">Group Name</label>
+          <input type="text" id="groupNameInput" class="form-control" required placeholder="Project Team">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label class="form-label">Description (Optional)</label>
+          <input type="text" id="groupDescInput" class="form-control" placeholder="What is this group about?">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label class="form-label">Select Members</label>
+          <div id="groupMembersPicker" style="max-height:160px; overflow-y:auto; border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:8px;">
+            <!-- Renderable user checkboxes -->
+          </div>
+        </div>
+        <button type="submit" class="auth-btn-primary" style="margin-top:0;">Create Group</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── MEDIA PREVIEW & CAPTION MODAL ──────────────────────────────────────── -->
+  <div id="mediaPreviewModal" class="media-preview-modal" style="display:none;">
+    <div class="media-preview-content">
+      <div class="media-preview-header">
+        <span id="mediaPreviewTitle">Preview</span>
+        <button class="icon-btn" id="closeMediaPreviewBtn" type="button" title="Cancel">✕</button>
+      </div>
+      <div class="media-preview-body" id="mediaPreviewBody">
+        <!-- Preview image or video injected dynamically -->
+      </div>
+      <div class="media-preview-footer">
+        <div class="media-preview-info">
+          <span id="mediaPreviewFileName">filename.jpg</span>
+          <span id="mediaPreviewFileSize">0 KB</span>
+        </div>
+        <div class="media-preview-caption-row">
+          <input type="text" id="mediaCaptionInput" class="chat-text-input" placeholder="Add a caption..." autocomplete="off">
+          <button class="icon-btn send-media-btn" id="sendMediaBtn" type="button" title="Send">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FULLSCREEN MEDIA LIGHTBOX ─────────────────────────────────────────── -->
+  <div id="mediaLightboxModal" class="media-lightbox" style="display:none;">
+    <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+    <div class="lightbox-header">
+      <div class="lightbox-info" id="lightboxInfo">Media Viewer</div>
+      <div class="lightbox-actions">
+        <a id="lightboxDownloadBtn" href="#" download class="icon-btn lightbox-btn" title="Download">⬇️</a>
+        <button id="closeLightboxBtn" class="icon-btn lightbox-btn" type="button" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="lightbox-body" id="lightboxBody">
+      <!-- Full-res image or playable video dynamically injected -->
+    </div>
+  </div>
+
+  <!-- ─── CAMERA CAPTURE MODAL ──────────────────────────────────────────────── -->
+  <div id="cameraModal" class="camera-modal" style="display:none;">
+    <div class="camera-modal-content">
+      <div class="camera-modal-header">
+        <span>Take Photo</span>
+        <button class="icon-btn" id="closeCameraBtn" type="button">✕</button>
+      </div>
+      <div class="camera-modal-body">
+        <video id="cameraVideo" autoplay playsinline></video>
+        <canvas id="cameraCanvas" style="display:none;"></canvas>
+      </div>
+      <div class="camera-modal-footer">
+        <button id="capturePhotoBtn" type="button" class="camera-capture-btn">📸 Capture</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Socket.IO Client CDN -->
+  <script src="https://cdn.socket.io/4.6.2/socket.io.min.js"></script>
+
+  <!-- Application Modules -->
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/socket.js"></script>
+  <script src="/js/media.js"></script>
+  <script src="/js/message.js"></script>
+  <script src="/js/search.js"></script>
+  <script src="/js/notification.js"></script>
+  <script src="/js/call.js"></script>
+  <script src="/js/group.js"></script>
+  <script src="/js/chat.js"></script>
+
+  <script>
+    // Modal Helpers
+    function openNewChatModal() {
+      document.getElementById('newChatModal').style.display = 'flex';
+      const input = document.getElementById('userSearchInput');
+      input.value = '';
+      input.focus();
+      renderUserSearchResults([]);
+    }
+
+    function closeNewChatModal() {
+      document.getElementById('newChatModal').style.display = 'none';
+    }
+
+    const userSearchInput = document.getElementById('userSearchInput');
+    userSearchInput.addEventListener('input', searchService.debounce(async (e) => {
+      const q = e.target.value;
+      if (!q.trim()) return renderUserSearchResults([]);
+      const users = await searchService.searchUsers(q);
+      renderUserSearchResults(users);
+    }, 250));
+
+    function renderUserSearchResults(users) {
+      const el = document.getElementById('userSearchResults');
+      if (!users || users.length === 0) {
+        el.innerHTML = `<div style="text-align:center; padding:15px; color:var(--text-muted); font-size:13px;">No users found</div>`;
+        return;
+      }
+      el.innerHTML = users.map(u => `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:var(--radius-sm); cursor:pointer; background:var(--hover-bg);" onclick="startChatWithUser('${u.id}')">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px;">
+              ${UI.renderAvatar(u.avatar ? `/uploads/${u.avatar}` : null, u.display_name)}
+            </div>
+            <div>
+              <div style="font-weight:600; font-size:14px;">${escapeHTML(u.display_name)}</div>
+              <div style="font-size:12px; color:var(--text-muted);">${escapeHTML(u.email)}</div>
+            </div>
+          </div>
+          <span style="font-size:18px; color:var(--secondary);">💬</span>
+        </div>
+      `).join('');
+    }
+
+    async function startChatWithUser(userId) {
+      closeNewChatModal();
+      try {
+        const res = await api.post('/chats', { user_id: userId });
+        if (res.success && res.data) {
+          await chatApp.loadChats();
+          await chatApp.openChat(res.data.chat_id);
+        }
+      } catch (err) {
+        UI.showToast(err.message, 'error');
+      }
+    }
+
+    // New Group Modal
+    async function openNewGroupModal() {
+      document.getElementById('newGroupModal').style.display = 'flex';
+      const picker = document.getElementById('groupMembersPicker');
+      picker.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Loading contacts...</div>';
+      try {
+        const res = await api.get('/users?limit=30');
+        if (res.success && res.data) {
+          picker.innerHTML = res.data.map(u => `
+            <label style="display:flex; align-items:center; gap:10px; padding:6px; cursor:pointer;">
+              <input type="checkbox" name="groupMember" value="${u.id}">
+              <span style="font-size:13px;">${escapeHTML(u.display_name)}</span>
+            </label>
+          `).join('');
+        }
+      } catch (err) {
+        picker.innerHTML = '<div style="color:var(--danger); font-size:12px;">Failed to load users</div>';
+      }
+    }
+
+    function closeNewGroupModal() {
+      document.getElementById('newGroupModal').style.display = 'none';
+    }
+
+    document.getElementById('newGroupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('groupNameInput').value;
+      const desc = document.getElementById('groupDescInput').value;
+      const checkboxes = document.querySelectorAll('input[name="groupMember"]:checked');
+      const memberIds = Array.from(checkboxes).map(cb => cb.value);
+
+      try {
+        const res = await groupManager.createGroup(name, desc, memberIds);
+        UI.showToast('Group created!', 'success');
+        closeNewGroupModal();
+        await chatApp.loadChats();
+        if (res.chat_id) {
+          await chatApp.openChat(res.chat_id);
+        }
+      } catch (err) {
+        UI.showToast(err.message, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

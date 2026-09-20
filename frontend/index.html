@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatFlow — Real-Time Messaging</title>
+  <script>
+    // Redirect immediately based on authentication status
+    const token = localStorage.getItem('chatflow_token');
+    if (token) {
+      window.location.replace('/chat.html');
+    } else {
+      window.location.replace('/login.html');
+    }
+  </script>
+</head>
+<body style="margin:0; background-color:#075e54; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; color:#fff;">
+  <div style="text-align:center;">
+    <h2>ChatFlow</h2>
+    <p>Loading your conversations...</p>
+  </div>
+</body>
+</html>

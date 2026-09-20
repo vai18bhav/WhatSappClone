@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — ChatFlow</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card" style="margin-top:20px;">
+      <div class="auth-brand">
+        <a href="#" class="brand-logo">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 13.85 2.5 15.55 3.39 17L2 22L7.23 20.65C8.63 21.5 10.26 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C10.5 20 9.09 19.58 7.87 18.84L7.54 18.64L4.41 19.46L5.25 16.41L5.04 16.07C4.24 14.81 3.81 13.43 3.81 12C3.81 7.48 7.48 3.81 12 3.81C16.52 3.81 20.19 7.48 20.19 12C20.19 16.52 16.52 20 12 20Z"/>
+          </svg>
+          ChatFlow
+        </a>
+        <p>Create your new account</p>
+      </div>
+
+      <form id="registerForm" class="auth-form">
+        <!-- Avatar Preview and File Input -->
+        <div class="avatar-upload-container">
+          <div class="avatar-preview-box" onclick="document.getElementById('avatarInput').click()">
+            <img id="avatarPreviewImg" src="" alt="Avatar" style="display:none;">
+            <div id="avatarPlaceholderIcon" class="upload-icon">📷</div>
+          </div>
+          <span style="font-size:12px; color:var(--text-muted); margin-top:6px;">Upload profile photo (optional)</span>
+          <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label class="form-label" for="regName">Display Name</label>
+          <input type="text" id="regName" class="form-control" required placeholder="Alex Smith">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label class="form-label" for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" class="form-control" required placeholder="alex@example.com" autocomplete="email">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label class="form-label" for="regPhone">Phone Number (Optional)</label>
+          <input type="tel" id="regPhone" class="form-control" placeholder="+1234567890">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label class="form-label" for="regPassword">Password</label>
+          <input type="password" id="regPassword" class="form-control" required placeholder="Min 8 chars, 1 uppercase & number" autocomplete="new-password">
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label class="form-label" for="regConfirmPassword">Confirm Password</label>
+          <input type="password" id="regConfirmPassword" class="form-control" required placeholder="Confirm your password" autocomplete="new-password">
+        </div>
+
+        <button type="submit" id="registerSubmitBtn" class="auth-btn-primary">Create Account</button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="/login.html">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    auth.redirectIfAuthenticated();
+
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarPreviewImg = document.getElementById('avatarPreviewImg');
+    const avatarPlaceholder = document.getElementById('avatarPlaceholderIcon');
+
+    avatarInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          avatarPreviewImg.src = re.target.result;
+          avatarPreviewImg.style.display = 'block';
+          avatarPlaceholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    const form = document.getElementById('registerForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const phone = document.getElementById('regPhone').value;
+      const pass = document.getElementById('regPassword').value;
+      const confirmPass = document.getElementById('regConfirmPassword').value;
+      const btn = document.getElementById('registerSubmitBtn');
+
+      if (pass !== confirmPass) {
+        return UI.showToast('Passwords do not match', 'error');
+      }
+
+      const formData = new FormData();
+      formData.append('display_name', name);
+      formData.append('email', email);
+      formData.append('password', pass);
+      if (phone) formData.append('phone', phone);
+      if (avatarInput.files[0]) formData.append('avatar', avatarInput.files[0]);
+
+      btn.disabled = true;
+      btn.innerText = 'Creating account...';
+
+      try {
+        await auth.register(formData);
+        window.location.href = '/chat.html';
+      } catch (err) {
+        UI.showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerText = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

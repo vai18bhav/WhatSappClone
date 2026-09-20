@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — ChatFlow</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <a href="#" class="brand-logo">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 13.85 2.5 15.55 3.39 17L2 22L7.23 20.65C8.63 21.5 10.26 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C10.5 20 9.09 19.58 7.87 18.84L7.54 18.64L4.41 19.46L5.25 16.41L5.04 16.07C4.24 14.81 3.81 13.43 3.81 12C3.81 7.48 7.48 3.81 12 3.81C16.52 3.81 20.19 7.48 20.19 12C20.19 16.52 16.52 20 12 20Z"/>
+          </svg>
+          ChatFlow
+        </a>
+        <p>Sign in to connect with friends & colleagues</p>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <div style="margin-bottom: 15px;">
+          <label class="form-label" for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" class="form-control" required placeholder="name@example.com" autocomplete="email">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline;">
+            <label class="form-label" for="loginPassword">Password</label>
+            <a href="#" onclick="showForgotModal(event)" style="font-size:12px; color:var(--secondary); text-decoration:none;">Forgot?</a>
+          </div>
+          <input type="password" id="loginPassword" class="form-control" required placeholder="Enter password" autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="loginSubmitBtn" class="auth-btn-primary">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="/register.html">Create one</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
+    <div style="background:var(--bg-card); padding:25px; border-radius:var(--radius-md); max-width:400px; width:90%; color:var(--text-main);">
+      <h3 style="margin-bottom:10px;">Reset Password</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Enter your account email to receive a password reset link.</p>
+      <input type="email" id="forgotEmail" class="form-control" placeholder="name@example.com" style="width:100%; margin-bottom:15px;">
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" onclick="closeForgotModal()" style="padding:8px 16px; border:none; background:var(--hover-bg); border-radius:var(--radius-sm); cursor:pointer;">Cancel</button>
+        <button type="button" onclick="handleForgotSubmit()" class="auth-btn-primary" style="width:auto; margin:0; padding:8px 16px;">Send Link</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    auth.redirectIfAuthenticated();
+
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginSubmitBtn');
+
+      btn.disabled = true;
+      btn.innerText = 'Signing in...';
+
+      try {
+        await auth.login(email, pass);
+        window.location.href = '/chat.html';
+      } catch (err) {
+        UI.showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerText = 'Sign In';
+      }
+    });
+
+    function showForgotModal(e) {
+      e.preventDefault();
+      document.getElementById('forgotModal').style.display = 'flex';
+    }
+
+    function closeForgotModal() {
+      document.getElementById('forgotModal').style.display = 'none';
+    }
+
+    async function handleForgotSubmit() {
+      const email = document.getElementById('forgotEmail').value;
+      if (!email) return UI.showToast('Please enter your email', 'error');
+      try {
+        await api.post('/auth/forgot-password', { email });
+        UI.showToast('If the account exists, a reset link was generated.', 'success');
+        closeForgotModal();
+      } catch (err) {
+        UI.showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

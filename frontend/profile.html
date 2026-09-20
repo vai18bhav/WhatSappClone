@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — ChatFlow</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body style="background-color: var(--bg-main);">
+  <div style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+    
+    <!-- Top Nav Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <a href="/chat.html" style="color:var(--secondary); text-decoration:none; font-weight:600; font-size:15px; display:flex; align-items:center; gap:6px;">
+        ← Back to Chats
+      </a>
+      <h2 style="font-size:20px; font-weight:700;">My Profile</h2>
+      <div style="width:70px;"></div>
+    </div>
+
+    <!-- Profile Details Card -->
+    <div style="background:var(--bg-card); padding:30px; border-radius:var(--radius-md); box-shadow:var(--shadow-sm); margin-bottom:25px;">
+      <form id="profileForm">
+        
+        <!-- Avatar Preview -->
+        <div class="avatar-upload-container">
+          <div class="avatar-preview-box" onclick="document.getElementById('avatarFileInput').click()">
+            <img id="profileAvatarImg" src="" alt="Avatar" style="display:none;">
+            <div class="upload-icon">📷</div>
+          </div>
+          <span style="font-size:12px; color:var(--text-muted); margin-top:6px;">Tap to change photo</span>
+          <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label class="form-label" for="profileName">Display Name</label>
+          <input type="text" id="profileName" class="form-control" required>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label class="form-label" for="profileEmail">Email (Cannot be changed)</label>
+          <input type="email" id="profileEmail" class="form-control" disabled style="opacity:0.7;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label class="form-label" for="profilePhone">Phone Number</label>
+          <input type="tel" id="profilePhone" class="form-control">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label class="form-label" for="profileBio">About / Bio</label>
+          <textarea id="profileBio" class="form-control" rows="3" placeholder="Hey there! I am using ChatFlow."></textarea>
+        </div>
+
+        <button type="submit" class="auth-btn-primary" style="margin-top:0;">Save Changes</button>
+      </form>
+    </div>
+
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/profile.js"></script>
+</body>
+</html>
