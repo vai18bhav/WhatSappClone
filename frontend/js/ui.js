@@ -150,8 +150,31 @@ function escapeHTML(str) {
   }[tag] || tag));
 }
 
-// Initialize theme & global keyboard shortcuts
+// Initialize theme, PWA service worker & global keyboard shortcuts
 document.addEventListener('DOMContentLoaded', () => {
   UI.initTheme();
   UI.initShortcuts();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ PWA Service Worker Registered'))
+      .catch((err) => console.warn('PWA SW Registration failed:', err));
+  }
+});
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const pwaBtn = document.getElementById('pwaInstallBtn');
+  if (pwaBtn) {
+    pwaBtn.style.display = 'inline-flex';
+    pwaBtn.onclick = () => {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+        pwaBtn.style.display = 'none';
+      });
+    };
+  }
 });
