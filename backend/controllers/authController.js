@@ -11,6 +11,35 @@ async function register(req, res, next) {
   try {
     const { email, password, display_name, phone } = req.body;
 
+    // Guarantee users table exists
+    try {
+      await pool.execute(`
+        CREATE TABLE IF NOT EXISTS users (
+          id VARCHAR(36) PRIMARY KEY,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          phone VARCHAR(20) UNIQUE DEFAULT NULL,
+          password_hash VARCHAR(255) NOT NULL,
+          display_name VARCHAR(100) NOT NULL,
+          avatar VARCHAR(500) DEFAULT NULL,
+          bio TEXT DEFAULT NULL,
+          is_online BOOLEAN DEFAULT FALSE,
+          last_seen TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          privacy_last_seen VARCHAR(20) DEFAULT 'everyone',
+          privacy_profile_photo VARCHAR(20) DEFAULT 'everyone',
+          privacy_about VARCHAR(20) DEFAULT 'everyone',
+          notification_prefs JSONB DEFAULT NULL,
+          is_active BOOLEAN DEFAULT TRUE,
+          email_verified BOOLEAN DEFAULT FALSE,
+          reset_token VARCHAR(255) DEFAULT NULL,
+          reset_token_expires TIMESTAMPTZ DEFAULT NULL,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+    } catch (e) {
+      // Table creation fallback
+    }
+
     // Check for existing email
     const [existing] = await pool.execute(
       'SELECT id FROM users WHERE email = ?', [email]
