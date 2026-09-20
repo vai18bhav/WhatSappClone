@@ -13,8 +13,8 @@ const socketClient = {
       return this.socket;
     }
 
-    // Connect to server origin
-    this.socket = io({
+    const serverUrl = window.CHATFLOW_SERVER_URL || undefined;
+    this.socket = io(serverUrl, {
       auth: { token },
       reconnection: true,
       reconnectionAttempts: 10,

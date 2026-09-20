@@ -2,7 +2,7 @@
 // REST API client wrapper with JWT header injection & error handling
 'use strict';
 
-const API_BASE = '/api';
+const API_BASE = window.CHATFLOW_API_BASE || '/api';
 
 const api = {
   getToken() {
