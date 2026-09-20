@@ -45,6 +45,7 @@ const io = new Server(server, {
 
 // Attach socket instance to app
 app.set('io', io);
+app.set('trust proxy', 1);
 
 // Attach socket event listeners
 socketHandler(io);

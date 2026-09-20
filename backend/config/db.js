@@ -71,6 +71,96 @@ async function testConnection() {
     if (isPg) {
       const client = await pool.connect();
       console.log('✅  PostgreSQL connected via DATABASE_URL');
+      
+      // Auto-initialize PostgreSQL tables if empty
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id VARCHAR(36) PRIMARY KEY,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          phone VARCHAR(20) UNIQUE DEFAULT NULL,
+          password_hash VARCHAR(255) NOT NULL,
+          display_name VARCHAR(100) NOT NULL,
+          avatar VARCHAR(500) DEFAULT NULL,
+          bio TEXT DEFAULT NULL,
+          is_online BOOLEAN DEFAULT FALSE,
+          last_seen TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          privacy_last_seen VARCHAR(20) DEFAULT 'everyone',
+          privacy_profile_photo VARCHAR(20) DEFAULT 'everyone',
+          privacy_about VARCHAR(20) DEFAULT 'everyone',
+          notification_prefs JSONB DEFAULT NULL,
+          is_active BOOLEAN DEFAULT TRUE,
+          email_verified BOOLEAN DEFAULT FALSE,
+          reset_token VARCHAR(255) DEFAULT NULL,
+          reset_token_expires TIMESTAMPTZ DEFAULT NULL,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS chats (
+          id VARCHAR(36) PRIMARY KEY,
+          type VARCHAR(20) NOT NULL DEFAULT 'direct',
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS chat_members (
+          id SERIAL PRIMARY KEY,
+          chat_id VARCHAR(36) NOT NULL REFERENCES chats(id) ON DELETE CASCADE,
+          user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          role VARCHAR(20) DEFAULT 'member',
+          joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          last_read_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          is_archived BOOLEAN DEFAULT FALSE,
+          is_muted BOOLEAN DEFAULT FALSE,
+          UNIQUE(chat_id, user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS groups (
+          id VARCHAR(36) PRIMARY KEY,
+          chat_id VARCHAR(36) NOT NULL UNIQUE REFERENCES chats(id) ON DELETE CASCADE,
+          name VARCHAR(100) NOT NULL,
+          description TEXT DEFAULT NULL,
+          avatar VARCHAR(500) DEFAULT NULL,
+          created_by VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS group_members (
+          id SERIAL PRIMARY KEY,
+          group_id VARCHAR(36) NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+          user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          role VARCHAR(20) DEFAULT 'member',
+          added_by VARCHAR(36) DEFAULT NULL,
+          joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(group_id, user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS messages (
+          id VARCHAR(36) PRIMARY KEY,
+          chat_id VARCHAR(36) NOT NULL REFERENCES chats(id) ON DELETE CASCADE,
+          sender_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          type VARCHAR(50) NOT NULL DEFAULT 'text',
+          content TEXT DEFAULT NULL,
+          reply_to_id VARCHAR(36) DEFAULT NULL REFERENCES messages(id) ON DELETE SET NULL,
+          is_edited BOOLEAN DEFAULT FALSE,
+          is_deleted_for_all BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS statuses (
+          id VARCHAR(36) PRIMARY KEY,
+          user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          type VARCHAR(50) DEFAULT 'text',
+          content VARCHAR(700) NOT NULL,
+          media_url VARCHAR(500) DEFAULT NULL,
+          background VARCHAR(20) NOT NULL DEFAULT '#075E54',
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          expires_at TIMESTAMPTZ NOT NULL
+        );
+      `);
+
       client.release();
     } else {
       const conn = await pool.getConnection();
