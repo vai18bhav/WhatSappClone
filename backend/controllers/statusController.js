@@ -8,6 +8,21 @@ const { generateId, buildResponse } = require('../utils/helpers');
 
 async function getStatuses(req, res, next) {
   try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS statuses (
+        id VARCHAR(36) PRIMARY KEY,
+        user_id VARCHAR(36) NOT NULL,
+        type VARCHAR(20) DEFAULT 'text',
+        content VARCHAR(700) NOT NULL,
+        media_url VARCHAR(500) DEFAULT NULL,
+        background VARCHAR(20) NOT NULL DEFAULT '#075E54',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        expires_at DATETIME NOT NULL,
+        INDEX idx_statuses_user_id (user_id),
+        INDEX idx_statuses_expires_at (expires_at)
+      )
+    `);
+
     const [rows] = await pool.execute(
       `SELECT s.id, s.user_id, COALESCE(s.type, 'text') AS type, s.content, s.media_url, s.background, s.created_at, s.expires_at,
               u.display_name, u.avatar
