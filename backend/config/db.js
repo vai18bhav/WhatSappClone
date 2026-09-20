@@ -21,14 +21,23 @@ if (process.env.DATABASE_URL) {
     ssl: { rejectUnauthorized: false }
   });
 
+  // Convert MySQL '?' placeholders to PostgreSQL '$1', '$2', '$3'
+  function convertSql(sql) {
+    if (!sql || typeof sql !== 'string') return sql;
+    let i = 1;
+    return sql.replace(/\?/g, () => `$${i++}`);
+  }
+
   // Polyfill execute and query to match MySQL2 interface
   pool = {
     async query(sql, params) {
-      const res = await pgPool.query(sql, params);
+      const converted = convertSql(sql);
+      const res = await pgPool.query(converted, params);
       return [res.rows, res.fields];
     },
     async execute(sql, params) {
-      const res = await pgPool.query(sql, params);
+      const converted = convertSql(sql);
+      const res = await pgPool.query(converted, params);
       return [res.rows, res.fields];
     },
     async getConnection() {
