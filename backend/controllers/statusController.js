@@ -12,7 +12,7 @@ async function getStatuses(req, res, next) {
       CREATE TABLE IF NOT EXISTS statuses (
         id VARCHAR(36) PRIMARY KEY,
         user_id VARCHAR(36) NOT NULL,
-        type VARCHAR(20) DEFAULT 'text',
+        type VARCHAR(50) DEFAULT 'text',
         content VARCHAR(700) NOT NULL,
         media_url VARCHAR(500) DEFAULT NULL,
         background VARCHAR(20) NOT NULL DEFAULT '#075E54',
@@ -22,6 +22,13 @@ async function getStatuses(req, res, next) {
         INDEX idx_statuses_expires_at (expires_at)
       )
     `);
+
+    try {
+      await pool.query(`ALTER TABLE statuses ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'text'`);
+      await pool.query(`ALTER TABLE statuses MODIFY COLUMN type VARCHAR(50) DEFAULT 'text'`);
+    } catch (e) {
+      // Column alteration fallback
+    }
 
     const [rows] = await pool.execute(
       `SELECT s.id, s.user_id, COALESCE(s.type, 'text') AS type, s.content, s.media_url, s.background, s.created_at, s.expires_at,
