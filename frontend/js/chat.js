@@ -651,15 +651,22 @@ const chatApp = {
 
     try {
       const res = await api.get(`/messages/chats/${chatId}/messages?limit=100`);
-      if (res.success && res.data) {
+      if (res && res.data) {
         container.innerHTML = '';
-        res.data.forEach(msg => {
-          container.innerHTML += messageRenderer.renderBubble(msg, this.currentUser.id);
-        });
+        if (res.data.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">No messages yet. Say hello! 👋</div>`;
+        } else {
+          res.data.forEach(msg => {
+            container.innerHTML += messageRenderer.renderBubble(msg, this.currentUser.id);
+          });
+        }
         this.scrollToBottom();
+      } else {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">No messages in this chat.</div>`;
       }
     } catch (err) {
-      container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger);">Error loading messages</div>`;
+      console.error('Error loading messages:', err);
+      container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger); font-size:13px;">Error loading messages (${err.message || 'Server error'})</div>`;
     }
   },
 

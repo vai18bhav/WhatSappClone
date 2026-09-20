@@ -159,6 +159,53 @@ async function testConnection() {
           updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS message_reads (
+          id SERIAL PRIMARY KEY,
+          message_id VARCHAR(36) NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+          user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          read_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(message_id, user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS message_reactions (
+          id SERIAL PRIMARY KEY,
+          message_id VARCHAR(36) NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+          user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          emoji VARCHAR(10) NOT NULL,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(message_id, user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS message_deletions (
+          id SERIAL PRIMARY KEY,
+          message_id VARCHAR(36) NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+          user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          deleted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(message_id, user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS starred_messages (
+          id SERIAL PRIMARY KEY,
+          message_id VARCHAR(36) NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+          user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          starred_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(message_id, user_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS media (
+          id VARCHAR(36) PRIMARY KEY,
+          message_id VARCHAR(36) DEFAULT NULL REFERENCES messages(id) ON DELETE CASCADE,
+          uploader_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          file_name VARCHAR(255) NOT NULL,
+          original_name VARCHAR(255) NOT NULL,
+          file_type VARCHAR(100) NOT NULL,
+          file_size INT NOT NULL,
+          file_path VARCHAR(500) NOT NULL,
+          thumbnail_path VARCHAR(500) DEFAULT NULL,
+          duration_seconds INT DEFAULT NULL,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE TABLE IF NOT EXISTS statuses (
           id VARCHAR(36) PRIMARY KEY,
           user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
