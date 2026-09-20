@@ -27,6 +27,7 @@ const mediaRoutes        = require('./routes/media');
 const notificationRoutes = require('./routes/notifications');
 const callRoutes         = require('./routes/calls');
 const statusRoutes       = require('./routes/statuses');
+const channelRoutes      = require('./routes/channels');
 
 const app    = express();
 const server = http.createServer(app);
@@ -103,6 +104,7 @@ app.use('/api/media', mediaRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/calls', callRoutes);
 app.use('/api/statuses', statusRoutes);
+app.use('/api/channels', channelRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
