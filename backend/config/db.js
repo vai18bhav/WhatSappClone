@@ -117,6 +117,14 @@ async function testConnection() {
           UNIQUE(chat_id, user_id)
         );
 
+        CREATE TABLE IF NOT EXISTS blocked_users (
+          id SERIAL PRIMARY KEY,
+          blocker_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          blocked_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(blocker_id, blocked_id)
+        );
+
         CREATE TABLE IF NOT EXISTS groups (
           id VARCHAR(36) PRIMARY KEY,
           chat_id VARCHAR(36) NOT NULL UNIQUE REFERENCES chats(id) ON DELETE CASCADE,

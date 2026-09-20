@@ -12,25 +12,38 @@ async function searchUsers(req, res, next) {
     const { limit, offset } = paginationParams(req.query);
     const currentUserId = req.user.id;
 
-    const searchTerm = `%${q.trim()}%`;
+    const trimmed = q.trim();
+    const isBlank = trimmed === '';
+    const searchTerm = `%${trimmed}%`;
 
-    // Exclude current user and users who blocked the requester (or are blocked by requester)
-    const [rows] = await pool.execute(
-      `SELECT u.id, u.display_name, u.email, u.avatar, u.bio, u.is_online, u.last_seen,
-              u.privacy_last_seen, u.privacy_profile_photo, u.privacy_about
-       FROM users u
-       WHERE u.id != ?
-         AND u.is_active = TRUE
-         AND (u.display_name LIKE ? OR u.email LIKE ? OR u.phone LIKE ?)
-         AND u.id NOT IN (
-           SELECT blocked_id  FROM blocked_users WHERE blocker_id = ?
-           UNION
-           SELECT blocker_id  FROM blocked_users WHERE blocked_id = ?
-         )
-       ORDER BY u.display_name ASC
-       LIMIT ? OFFSET ?`,
-      [currentUserId, searchTerm, searchTerm, searchTerm, currentUserId, currentUserId, limit, offset]
-    );
+    // Exclude current user and blocked users
+    let querySql;
+    let queryParams;
+
+    if (isBlank) {
+      querySql = `
+        SELECT u.id, u.display_name, u.email, u.avatar, u.bio, u.is_online, u.last_seen,
+               u.privacy_last_seen, u.privacy_profile_photo, u.privacy_about
+        FROM users u
+        WHERE u.id != ?
+          AND u.is_active = TRUE
+        ORDER BY u.display_name ASC
+        LIMIT ? OFFSET ?`;
+      queryParams = [currentUserId, limit, offset];
+    } else {
+      querySql = `
+        SELECT u.id, u.display_name, u.email, u.avatar, u.bio, u.is_online, u.last_seen,
+               u.privacy_last_seen, u.privacy_profile_photo, u.privacy_about
+        FROM users u
+        WHERE u.id != ?
+          AND u.is_active = TRUE
+          AND (LOWER(u.display_name) LIKE LOWER(?) OR LOWER(u.email) LIKE LOWER(?) OR LOWER(COALESCE(u.phone, '')) LIKE LOWER(?))
+        ORDER BY u.display_name ASC
+        LIMIT ? OFFSET ?`;
+      queryParams = [currentUserId, searchTerm, searchTerm, searchTerm, limit, offset];
+    }
+
+    const [rows] = await pool.execute(querySql, queryParams);
 
     // Apply privacy settings — hide last_seen if privacy is 'nobody'
     const users = rows.map(u => {
