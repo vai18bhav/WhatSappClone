@@ -16,10 +16,28 @@ let isPg = false;
 
 if (process.env.DATABASE_URL) {
   isPg = true;
-  pool = new PgPool({
+  const pgPool = new PgPool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
   });
+
+  // Polyfill execute and query to match MySQL2 interface
+  pool = {
+    async query(sql, params) {
+      const res = await pgPool.query(sql, params);
+      return [res.rows, res.fields];
+    },
+    async execute(sql, params) {
+      const res = await pgPool.query(sql, params);
+      return [res.rows, res.fields];
+    },
+    async getConnection() {
+      return pgPool.connect();
+    },
+    connect() {
+      return pgPool.connect();
+    }
+  };
 } else {
   pool = mysql.createPool({
     host:               process.env.DB_HOST     || 'localhost',
