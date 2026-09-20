@@ -31,7 +31,7 @@ jobs:
 
       - name: Initialize Capacitor App
         run: |
-          npx cap init ChatFlow com.chatflow.app --web-dir frontend
+          npx cap init whatsapp12 com.whatsapp12.app --web-dir frontend
 
       - name: Add Android Platform
         run: |

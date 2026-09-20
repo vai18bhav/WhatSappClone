@@ -1,6 +1,6 @@
 {
-  "name": "ChatFlow",
-  "short_name": "ChatFlow",
+  "name": "whatsapp12",
+  "short_name": "whatsapp12",
   "description": "WhatsApp-style Real-time Messaging and Calling Web Application",
   "start_url": "/",
   "display": "standalone",
