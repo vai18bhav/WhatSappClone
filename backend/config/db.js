@@ -21,11 +21,13 @@ if (process.env.DATABASE_URL) {
     ssl: { rejectUnauthorized: false }
   });
 
-  // Convert MySQL '?' placeholders to PostgreSQL '$1', '$2', '$3'
+  // Convert MySQL syntax & '?' placeholders to PostgreSQL '$1', '$2', '$3'
   function convertSql(sql) {
     if (!sql || typeof sql !== 'string') return sql;
+    let converted = sql.replace(/DATE_ADD\s*\(\s*NOW\(\)\s*,\s*INTERVAL\s+(\d+)\s+HOUR\s*\)/gi, "CURRENT_TIMESTAMP + INTERVAL '$1 hours'");
+    converted = converted.replace(/NOW\(\)/gi, 'CURRENT_TIMESTAMP');
     let i = 1;
-    return sql.replace(/\?/g, () => `$${i++}`);
+    return converted.replace(/\?/g, () => `$${i++}`);
   }
 
   // Polyfill execute and query to match MySQL2 interface
