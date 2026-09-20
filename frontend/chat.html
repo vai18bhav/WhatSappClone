@@ -343,12 +343,13 @@
 
   <script>
     // Modal Helpers
-    function openNewChatModal() {
+    async function openNewChatModal() {
       document.getElementById('newChatModal').style.display = 'flex';
       const input = document.getElementById('userSearchInput');
       input.value = '';
       input.focus();
-      renderUserSearchResults([]);
+      const users = await searchService.searchUsers('');
+      renderUserSearchResults(users);
     }
 
     function closeNewChatModal() {
@@ -358,7 +359,6 @@
     const userSearchInput = document.getElementById('userSearchInput');
     userSearchInput.addEventListener('input', searchService.debounce(async (e) => {
       const q = e.target.value;
-      if (!q.trim()) return renderUserSearchResults([]);
       const users = await searchService.searchUsers(q);
       renderUserSearchResults(users);
     }, 250));
