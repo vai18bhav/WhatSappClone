@@ -116,6 +116,24 @@ const UI = {
     return date.toLocaleDateString();
   },
 
+  // ─── Native Share App ────────────────────────────────────────────────────────
+  shareApp() {
+    const shareData = {
+      title: 'whatsapp12',
+      text: 'Connect with me on whatsapp12!',
+      url: window.location.origin
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.origin);
+      this.showToast('App link copied to clipboard!', 'success');
+    } else {
+      prompt('Copy app link:', window.location.origin);
+    }
+  },
+
   // ─── Keyboard Shortcuts Setup ──────────────────────────────────────────────
   initShortcuts() {
     document.addEventListener('keydown', (e) => {

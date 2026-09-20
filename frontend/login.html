@@ -22,9 +22,12 @@
           whatsapp12
         </a>
         <p>Sign in to connect with friends & colleagues</p>
-        <div style="margin-top: 15px;">
-          <button id="pwaInstallBtn" type="button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
-            📲 Install whatsapp12 App on Mobile
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+          <button id="pwaInstallBtn" type="button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 12px; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+            📲 Install App
+          </button>
+          <button onclick="UI.shareApp()" type="button" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; background: var(--hover-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px;">
+            🔗 Share App
           </button>
         </div>
       </div>
